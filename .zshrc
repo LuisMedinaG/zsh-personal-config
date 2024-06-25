@@ -3,12 +3,17 @@
 # 
 
 # Profile
-PROMPT='lumedina@arch:%1 %~ %#'
-
-PROMPT="%n$ "
+PS1="%n@%m %~ %# "
 RPROMPT="%*"
 
-# History
+# Enable color support
+autoload -U colors
+colors
+
+# Set editor
+export EDITOR="vim"
+
+# History settings
 # No duplicate history when reverse-searching my commands
 HISTSIZE=5000
 HISTFILE=~/.zsh_history
@@ -27,8 +32,31 @@ autoload -U compinit && compinit
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
 # Emacs-style keybindings
-bindkey -e
+# bindkey -e
 
+# zsh-syntax-highlighting
+# Mac OS X / Homebrew: brew install zsh-syntax-highlighting
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-# PATH
+# Load additional plugins if needed
+# Example: plugins=(git)
+
+# Custom paths
 export PATH="/usr/local/bin:$PATH"
+
+# Essentials
+# ack
+# https://beyondgrep.com/
+
+# ack.vim
+# https://github.com/mileszs/ack.vim
+
+# bat
+# https://github.com/sharkdp/bat
+
+# (Optional) More plugins, tools, themes, etc.
+# https://github.com/alebcay/awesome-shell
+
+# Tmux
+# https://github.com/tmux/tmux/wiki
+# https://hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/
