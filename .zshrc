@@ -2,25 +2,126 @@
 # Luis Medina ZSH profile
 # 
 
+# Add Homebrew to the PATH.
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# See: https://iterm2.com/documentation-shell-integration.html
+# test -e "${ZDOTDIR}/.iterm2_shell_integration.zsh" && source "${ZDOTDIR}/.iterm2_shell_integration.zsh" || true
+
+# Add brew's version of curl to the PATH
+export PATH="$(brew --prefix curl)/bin:$PATH"
+
+# Locale
+export LC_ALL="en_US.UTF-8"
+
+# Run Oh My Posh prompt.
+# See: https://ohmyposh.dev/
+# eval "$(oh-my-posh --init --shell zsh --config $HOME/.zsh/adamnorwood.omp.json)"
+
+# Aliases to make life easier.
+alias ...='cd ../../'
+alias ....='cd ../../../'
+alias grep='grep --color=auto'
+alias h='history 1'
+alias l='ls -lAh'
+alias python='/usr/local/bin/python3'
+alias g='git'
+alias gpl='git pull'
+alias gps='git push'
+alias gc='git checkout'
+alias ghc='git rev-parse HEAD | pbcopy'
+
+# Set up Zsh options. There are many of these that can be tweaked!
+# See: https://zsh.sourceforge.io/Doc/Release/Options.html
+setopt alwaystoend
+setopt appendhistory
+setopt autocd
+setopt autolist
+setopt automenu
+setopt autopushd
+setopt completeinword
+setopt correct
+setopt extendedhistory
+setopt histexpiredupsfirst
+setopt histignoredups
+setopt histignorespace
+setopt histverify
+setopt interactivecomments
+setopt listpacked
+setopt longlistjobs
+setopt nocaseglob
+setopt noflowcontrol
+setopt promptsubst
+setopt pushdignoredups
+setopt pushdminus
+setopt sharehistory
+
+# See: https://thevaluable.dev/zsh-install-configure-mouseless/
+setopt AUTO_PUSHD           # Push the current directory visited on the stack.
+setopt PUSHD_IGNORE_DUPS    # Do not store duplicates in the stack.
+setopt PUSHD_SILENT         # Do not print the directory stack after pushd or popd.
+
+alias d='dirs -v'
+for index ({1..9}) alias "$index"="cd +${index}"; unset index
+
 # Profile
-PS1="%n@%m %~ %# "
-RPROMPT="%*"
+autoload -Uz colors && colors
+PS1="%{$fg[cyan]%}%n@%m %{$fg[green]%}%1~ %{$reset_color%}%# "
+RPROMPT="%{$fg[yellow]%}%*%{$reset_color%}"
+
+# eval "$(oh-my-posh init zsh)"
 
 # Enable color support
 autoload -U colors
 colors
 
+# Set up zsh up/down/home/end key search completions.
+autoload -U history-search-end
+zle -N history-beginning-search-backward-end history-search-end
+zle -N history-beginning-search-forward-end history-search-end
+bindkey -e
+bindkey "^[[A" history-beginning-search-backward-end
+bindkey "^[[B" history-beginning-search-forward-end
+bindkey '\e[H' beginning-of-line
+bindkey '\e[F' end-of-line
+bindkey '[C' forward-word
+bindkey '[D' backward-word
+
+# Define a custom backward delete word function
+# zle_backward_kill_word() {
+#     # Set custom word characters
+#     local WORDCHARS='*?_-.[]~=/&;!#$%^(){}<>'
+#     zle backward-kill-word
+# }
+
+# # Bind the custom function to ^W
+# zle -N zle_backward_kill_word
+# bindkey '^W' zle_backward_kill_word
+
 # ZSH Theme
-# ZSH_THEME="robbyrussell"
+# ZSH_THEME=""
 
 # Set editor
-export EDITOR="vim"
+export EDITOR="code"
+
+# Add files and directories color when running ls
+# There's a generator here: http://geoff.greer.fm/lscolors/
+# export CLICOLOR=1
+# export LS_COLORS='di=36:ln=1;35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
+# export GREP_COLOR='1;35;40'
+
+# jenv (for multiple java jdk versions)
+eval "$(jenv init -)"
+
+# zsh-syntax-highlighting
+# See: https://github.com/zsh-users/zsh-syntax-highlighting
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # History settings
 # No duplicate history when reverse-searching my commands
-HISTSIZE=5000
+HISTSIZE=10000
 HISTFILE=~/.zsh_history
-SAVEHIST=5000
+SAVEHIST=10000
 HISTDUP=erase
 setopt appendhistory
 setopt sharehistory
@@ -30,23 +131,46 @@ setopt hist_save_no_dups
 setopt hist_ignore_dups
 setopt hist_find_no_dups
 
-# Case insensitive completion
-autoload -U compinit && compinit
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+# Load zsh completion system
+# autoload -Uz compinit
+# compinit
 
-# zsh-syntax-highlighting
-# Mac OS X / Homebrew: brew install zsh-syntax-highlighting
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source ~/.zsh/completion.zsh
+
+# Case insensitive completion
+# Trick out the zsh completion engine.
+# See: https://www.csse.uwa.edu.au/programming/linux/zsh-doc/zsh_23.html
+# The following lines were added by compinstall
+zstyle ':completion:*' auto-description 'specify: %d'
+zstyle ':completion:*' completer _complete _ignored _approximate
+zstyle ':completion:*' completions 1
+zstyle ':completion:*' glob 1
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*' insert-unambiguous true
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+# zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
+zstyle ':completion:*' matcher-list 'm:{[:lower:]}={[:upper:]}'
+zstyle ':completion:*' max-errors 1
+zstyle ':completion:*' menu select=0
+zstyle ':completion:*' original true
+zstyle ':completion:*' prompt 'Did you mean?'
+zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
+zstyle ':completion:*' verbose true
 
 # Load additional plugins if needed
 # Example: plugins=(git)
 
-# PATH
-export PATH="/usr/local/bin:$PATH"
+# Environment
+export PATH="/usr/local/bin:$HOME/.jenv/bin:/opt/homebrew/opt/openjdk@17/bin:/opt/homebrew/bin/jenv:$PATH"
+export HOMEBREW_AUTO_UPDATE_SECS=86400
 
 # Essentials
+
+# oh-my-posh
+# See: https://ohmyposh.dev/
+
 # fzf
-# https://github.com/junegunn/fzf
+# See: https://github.com/junegunn/fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 export FZF_COMPLETION_TRIGGER='~~'
@@ -102,16 +226,16 @@ zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
 
 # ack
-# https://beyondgrep.com/
+# See: https://beyondgrep.com/
 
 # ack.vim
-# https://github.com/mileszs/ack.vim
+# See: https://github.com/mileszs/ack.vim
 
 # bat
-# https://github.com/sharkdp/bat
+# See: https://github.com/sharkdp/bat
 
 # forgit
-# https://github.com/wfxr/forgit
+# See: https://github.com/wfxr/forgit
 
 # (Optional) More plugins, tools, themes, etc.
 # https://github.com/alebcay/awesome-shell
@@ -120,5 +244,33 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
 # https://github.com/tmux/tmux/wiki
 # https://hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/
 
-# Common alias
-# alias python='/usr/local/bin/python3'
+# zsh-bd
+# . $HOME/.zsh/plugins/bd/bd.zsh
+
+# Just adding a fun image for when the shell first opens. Why? Because I can.
+# Require imgcat: https://github.com/eddieantonio/imgcat
+# imgcat ~/Pictures/bubble-bobble.png
+
+# # Yubikey handler
+reload-ssh() {
+   ssh-add -e /usr/local/lib/opensc-pkcs11.so >> /dev/null
+   if [ $? -gt 0 ]; then
+       echo "Failed to remove previous card"
+   fi
+   ssh-add -s /usr/local/lib/opensc-pkcs11.so
+}
+
+# Environmemnt
+source ~/.zshenv
+
+## pic-tools
+source $HOME/Documents/dbaas/local/pic-tools/scripts/*.env
+
+### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
+export PATH="/Users/lumedina/.rd/bin:$PATH"
+### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
+
+
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
